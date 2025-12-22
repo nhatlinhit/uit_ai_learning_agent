@@ -69,7 +69,11 @@ const Home = () => {
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100">
       {/* Chat Container */}
-      <ChatContainer messages={messages} isLoading={isLoading} />
+      <ChatContainer
+        messages={messages}
+        isLoading={isLoading}
+        onSendMessage={handleSendMessage}
+      />
 
       {/* Chat Input */}
       <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />

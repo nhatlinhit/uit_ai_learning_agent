@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import ChatMessage from './ChatMessage';
 import LoadingIndicator from './LoadingIndicator';
 
-const ChatContainer = ({ messages, isLoading }) => {
+const ChatContainer = ({ messages, isLoading, onSendMessage }) => {
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -70,6 +70,7 @@ const ChatContainer = ({ messages, isLoading }) => {
             message={msg.text}
             type={msg.type}
             metadata={msg.metadata}
+            onSendMessage={onSendMessage}
           />
         ))}
 

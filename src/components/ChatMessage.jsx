@@ -1,12 +1,19 @@
 import { useState } from 'react';
 
-const ChatMessage = ({ message, type, metadata }) => {
+const ChatMessage = ({ message, type, metadata, onSendMessage }) => {
   const isUser = type === 'user';
   const [showDetails, setShowDetails] = useState(false);
 
   // Check if this is an AI message with search results
   const hasResults = !isUser && metadata?.results && metadata.results.length > 0;
   const hasError = !isUser && metadata?.error;
+
+  // Handle clicking on a result topic to search for it
+  const handleTopicClick = (topic) => {
+    if (onSendMessage && topic) {
+      onSendMessage(topic);
+    }
+  };
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 sm:mb-5 animate-fadeIn`}>
@@ -68,7 +75,13 @@ const ChatMessage = ({ message, type, metadata }) => {
                   <div className="flex items-start gap-2">
                     <span className="text-lg">🎯</span>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-800">{metadata.topResult.topic}</p>
+                      <button
+                        onClick={() => handleTopicClick(metadata.topResult.topic)}
+                        className="text-sm font-semibold text-gray-800 hover:text-blue-600 transition-colors cursor-pointer text-left underline decoration-dotted underline-offset-2 hover:decoration-solid"
+                        title="Click to search for this topic"
+                      >
+                        {metadata.topResult.topic}
+                      </button>
                       <div className="flex gap-2 mt-1 flex-wrap">
                         <span className="text-xs bg-white px-2 py-0.5 rounded-full text-gray-600">
                           Chapter {metadata.topResult.chapter}
@@ -89,11 +102,17 @@ const ChatMessage = ({ message, type, metadata }) => {
                   <div className="mt-3 space-y-2 animate-fadeIn">
                     <p className="text-xs font-semibold text-gray-600 mb-2">All Results ({metadata.results.length}):</p>
                     {metadata.results.map((result, index) => (
-                      <div key={index} className="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
+                      <div key={index} className="bg-gray-50 rounded-lg p-2.5 border border-gray-200 hover:bg-gray-100 transition-colors">
                         <div className="flex items-start gap-2">
                           <span className="text-xs font-bold text-indigo-600 mt-0.5">#{result.rank}</span>
                           <div className="flex-1">
-                            <p className="text-xs font-semibold text-gray-800">{result.topic}</p>
+                            <button
+                              onClick={() => handleTopicClick(result.topic)}
+                              className="text-xs font-semibold text-gray-800 hover:text-blue-600 transition-colors cursor-pointer text-left underline decoration-dotted underline-offset-2 hover:decoration-solid"
+                              title="Click to search for this topic"
+                            >
+                              {result.topic}
+                            </button>
                             <p className="text-xs text-gray-600 mt-1 line-clamp-2">{result.raw_text}</p>
                             <div className="flex gap-2 mt-1.5 flex-wrap">
                               <span className="text-xs bg-white px-1.5 py-0.5 rounded text-gray-500">

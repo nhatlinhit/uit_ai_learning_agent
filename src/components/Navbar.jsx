@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import packageJson from '../../package.json';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const version = packageJson.version;
 
   const navLinks = [
     { path: '/', label: 'Home', icon: '🏠' },
@@ -25,9 +27,14 @@ const Navbar = () => {
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transform group-hover:scale-110 transition-all duration-300">
                 <span className="text-white font-bold text-xl">AI</span>
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hidden sm:block">
-                UIT Learning AI
-              </span>
+              <div className="hidden sm:flex sm:flex-col">
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  UIT Learning AI
+                </span>
+                <span className="text-xs font-normal text-gray-500 -mt-1">
+                  v{version}
+                </span>
+              </div>
             </Link>
           </div>
 
