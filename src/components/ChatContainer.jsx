@@ -69,6 +69,7 @@ const ChatContainer = ({ messages, isLoading }) => {
             key={msg.id}
             message={msg.text}
             type={msg.type}
+            metadata={msg.metadata}
           />
         ))}
 

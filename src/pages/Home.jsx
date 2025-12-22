@@ -1,13 +1,14 @@
 import { useState, useRef } from 'react';
 import ChatContainer from '../components/ChatContainer';
 import ChatInput from '../components/ChatInput';
+import { searchKnowledge, formatSearchResults } from '../services/api';
 
 const Home = () => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const messageIdCounter = useRef(0);
 
-  const handleSendMessage = (messageText) => {
+  const handleSendMessage = async (messageText) => {
     // Add user message
     const userMessage = {
       id: ++messageIdCounter.current,
@@ -19,28 +20,50 @@ const Home = () => {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
-    // Simulate AI response with delay
-    setTimeout(() => {
+    try {
+      // Call the real API
+      const apiResponse = await searchKnowledge(messageText, {
+        top_k: 5,
+        semantic_weight: 0.4,
+        bm25_weight: 0.4,
+        keyword_weight: 0.2,
+      });
+
+      // Format the results
+      const formattedResponse = formatSearchResults(apiResponse);
+
+      // Create AI message with results
       const aiMessage = {
         id: ++messageIdCounter.current,
         type: 'ai',
-        text: generateAIResponse(messageText),
+        text: formattedResponse.text,
         timestamp: new Date().toISOString(),
+        metadata: {
+          query: formattedResponse.query,
+          processed_query: formattedResponse.processed_query,
+          results: formattedResponse.results,
+          topResult: formattedResponse.topResult,
+          error: formattedResponse.error,
+        },
       };
-      setMessages((prev) => [...prev, aiMessage]);
-      setIsLoading(false);
-    }, 1500);
-  };
 
-  // Placeholder AI response generator
-  const generateAIResponse = (userMessage) => {
-    const responses = [
-      `That's an interesting question about "${userMessage}". Let me help you understand this better. This is a placeholder response that will be replaced with actual AI integration in the next steps.`,
-      `Great question! Regarding "${userMessage}", I can provide you with detailed information. AI integration will make these responses more intelligent and contextual.`,
-      `I understand you're asking about "${userMessage}". This is a simulated response. In the next phase, we'll integrate real AI capabilities to provide accurate and helpful answers.`,
-      `Thank you for asking about "${userMessage}". This demonstrates the chat interface functionality. Real AI responses will be much more comprehensive and tailored to your specific needs.`,
-    ];
-    return responses[Math.floor(Math.random() * responses.length)];
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      // Handle unexpected errors
+      const errorMessage = {
+        id: ++messageIdCounter.current,
+        type: 'ai',
+        text: "I apologize, but I encountered an unexpected error. Please try again.",
+        timestamp: new Date().toISOString(),
+        metadata: {
+          error: true,
+        },
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+      console.error('Error in handleSendMessage:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
